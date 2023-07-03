@@ -6,4 +6,9 @@ There is more than one way to use Harshicorp Vault to secure secrets, passwords,
 
 The first feature is **Transit Secrets Engine**:
 
-- This Hashicorp feature allows you to encrypt and decrypt data
+- This Hashicorp feature allows you to encrypt data **in transit and at rest**.
+
+![image](https://github.com/janeteneto/Harshicorp-Vault/assets/129942042/8da9f268-accd-4340-bcf4-59818f7a4fd9)
+
+### Steps:
+
