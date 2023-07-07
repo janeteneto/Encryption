@@ -59,7 +59,7 @@ vault server -dev
 ````
 - The vault is ready to be used!
 
-#### Enable Transit Secrets Engine
+#### Enable Transit Secrets Engine and encrypt `terraform.tfstate` file
 
 1. On the Vault UI, press the left-side menu and press `Policies`
 2. Press `Create ACL policy` and add the following code:
@@ -90,4 +90,9 @@ vault secrets enable transit
 6. Create an encryption key ring named `test` by executing the following command:
 ````
 vault write -f transit/keys/my-key
+````
+````
+$fileContent = [System.IO.File]::ReadAllBytes('C:\Users\user\terraform\terraform.tfstate')
+$base64Content = [System.Convert]::ToBase64String($fileContent)
+$encryptedContent = vault write -field=ciphertext transit/encrypt/my-key plaintext=$base64Content
 ````
