@@ -1,16 +1,14 @@
 # Harshicorp Vault - Transit Secrets Engine
 
-## How to safely secure secrets that are currently stored in a `tfstate` file in S3
+## How to safely encrypt a file before storing in S3
 
-There is more than one way to use Harshicorp Vault to secure secrets, passwords, several platform credentials like AWS, K8 and Azure, and even ways to encrypt and safely secure files. Today I will explore ways to secure files, specifically a default file created when you initialise Terraform, called **`tfstate` file**. 
-
-The Vaul't feature I am using is **Transit Secrets Engine**- This Hashicorp feature allows you to encrypt data **in transit and at rest**:
+There is more than one way to use Harshicorp Vault to secure secrets, passwords, several platform credentials like AWS, K8 and Azure, and even ways to encrypt and safely secure files. Today I will explore ways to secure files using Vault's feature **Transit Secrets Engine** - this Hashicorp feature allows you to encrypt data/files **in transit and at rest**, and at **client-side**.
 
 ![image](https://github.com/janeteneto/Harshicorp-Vault/assets/129942042/8da9f268-accd-4340-bcf4-59818f7a4fd9)
 
 ### Create an S3 bucket and enable DSSE-KMS Encryption
 
-**First, I will create a bucket on AWS with Dual-layer server-side encryption with AWS Key Management Service keys (DSSE-KMS). This will give the objects in the bucket two separate layers of encryption:**
+**First, I will create a bucket on AWS with Dual-layer server-side encryption with AWS Key Management Service keys (DSSE-KMS). This will give the objects in the bucket two separate layers of encryption on server-side:**
 
 1. Search S3 on AWS
 2. Press `Create Bucket`
@@ -41,7 +39,7 @@ The Vaul't feature I am using is **Transit Secrets Engine**- This Hashicorp feat
 
 - Only the root account can get access when you upload a file to this bucket, but this will go according to the policies you specify. The objects in the bucket can only be retrieved by authorised users, and they are encrypted, which means even authorised users will need the key to decrypt the object.
 
-### Encrypt file locally using Vault Transit Secrets Engine
+### Encrypt file locally (client-side) using Vault Transit Secrets Engine
 
 #### Setup Vault
 - I will base this tutorial using the CLI instead of the web UI
@@ -50,11 +48,11 @@ The Vaul't feature I am using is **Transit Secrets Engine**- This Hashicorp feat
 
 2. Then command:
 ````
-vault server -dev -dev-root-token-id root
+vault server -dev
 ````
 
 3. Copy the IP address and paste it into the browser
-4. Copy the root token from the terminal and paste it on the field
+4. Copy the root token from the terminal and paste it on the field - only one token is needed for accessing the same vault server
 5. Open a new PowerShell terminal **as admin** and run the commands:
 ````
  $env:VAULT_ADDR="http://127.0.0.1:8200"
@@ -91,5 +89,5 @@ vault secrets enable transit
 
 6. Create an encryption key ring named `test` by executing the following command:
 ````
-vault write -f transit/keys/test
+vault write -f transit/keys/my-key
 ````
