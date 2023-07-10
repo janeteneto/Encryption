@@ -57,32 +57,16 @@ vault server -dev
 ````
  $env:VAULT_ADDR="http://127.0.0.1:8200"
 ````
+**Or**, if you are setting up Vault on a Linux environment, run the following commands to set the environment variable:
+````
+export VAULT_ADDR="http://127.0.0.1:8200"
+````
+
 - The vault is ready to be used!
 
-#### Enable Transit Secrets Engine and encrypt `terraform.tfstate` file
+#### Enable Transit Secrets Engine and encrypt the `terraform.tfstate` file
 
-1. On the Vault UI, press the left-side menu and press `Policies`
-2. Press `Create ACL policy` and add the following code:
-````
-# Enable transit secrets engine
-path "sys/mounts/transit" {
-  capabilities = [ "create", "read", "update", "delete", "list" ]
-}
-
-# To read enabled secrets engines
-path "sys/mounts" {
-  capabilities = [ "read" ]
-}
-
-# Manage the transit secrets engine
-path "transit/*" {
-  capabilities = [ "create", "read", "update", "delete", "list" ]
-}
-````
-
-3. Give the policy a name and create it.
-
-4. On the same PowerShell terminal, run the command
+1. On the same PowerShell terminal, run the command
 ````
 vault secrets enable transit
 ````
@@ -91,8 +75,62 @@ vault secrets enable transit
 ````
 vault write -f transit/keys/my-key
 ````
+7. Run the following commands to carry out the encryption of the file:
+
 ````
+# Read the contents of the file into a byte array
 $fileContent = [System.IO.File]::ReadAllBytes('C:\Users\user\terraform\terraform.tfstate')
+
+# Convert the byte array content to a Base64-encoded string
 $base64Content = [System.Convert]::ToBase64String($fileContent)
+
+# Encrypt the Base64-encoded content using the Transit Secrets Engine in Vault
 $encryptedContent = vault write -field=ciphertext transit/encrypt/my-key plaintext=$base64Content
+````
+
+#### Automate encryption with Transit Secrets Engine
+
+**- To automate the encryption of the tfstate file, I will create a script and trigger it on the `main.tf` file so that the script is executed when we run `terraform apply`.**
+
+1. Create a `script.sh` file that will contain the script to automate the process of encrypting the tfstate file using transit engine
+2. Add the following code:
+````
+#!/bin/bash
+
+# Specify the file path of the file you want to encrypt
+filePath="$1"
+
+# Read the contents of the file into a byte array
+fileContent=$(cat "$filePath")
+
+# Convert the content to Base64-encoded string
+base64Content=$(echo -n "$fileContent" | base64)
+
+# Encrypt the Base64-encoded content using the Transit Secrets Engine in Vault
+encryptedContent=$(vault write -field=ciphertext transit/encrypt/my-key plaintext="$base64Content")
+
+# Overwrite the original file with the encrypted content
+echo "$encryptedContent" > "$filePath"
+````
+
+3. Open your terraform `main.tf` file
+4. The file should have the following code:
+````
+resource "null_resource" "encrypt_tfstate" {
+  triggers = {
+    timestamp = timestamp()
+  }
+
+  provisioner "local-exec" {
+    command = "path/to/your/script.sh"
+  }
+}
+
+terraform {
+  backend "s3" {
+    bucket = "your-s3-bucket"
+    key    = "terraform.tfstate"
+    encrypt = true
+  }
+}
 ````
