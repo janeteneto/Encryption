@@ -91,49 +91,17 @@ $encryptedContent = vault write -field=ciphertext transit/encrypt/my-key plainte
 $encryptedContent > 'C:\Users\user\test.txt'
 ````
 
-#### Automate encryption with Transit Secrets Engine
-
-**- To automate the encryption of the tfstate file, I will create a script and trigger it on the `main.tf` file so that the script is executed when we run `terraform apply`.**
-
-1. Create a `script.sh` file that will contain the script to automate the process of encrypting the tfstate file using transit engine
-2. Add the following code:
+8. Decrypt file:
 ````
-#!/bin/bash
+# Read the encrypted content from the file
+$encryptedContent = Get-Content -Raw -Path 'C:\Users\user\test.txt'
 
-# Specify the file path of the file you want to encrypt
-filePath="$1"
+# Decrypt the content using the Transit Secrets Engine in Vault
+$decryptedContent = vault write -field=plaintext transit/decrypt/my-key ciphertext=$encryptedContent
 
-# Read the contents of the file into a byte array
-fileContent=$(cat "$filePath")
+# Convert the decrypted Base64-encoded content back to a byte array
+$decryptedBytes = [System.Convert]::FromBase64String($decryptedContent)
 
-# Convert the content to Base64-encoded string
-base64Content=$(echo -n "$fileContent" | base64)
-
-# Encrypt the Base64-encoded content using the Transit Secrets Engine in Vault
-encryptedContent=$(vault write -field=ciphertext transit/encrypt/my-key plaintext="$base64Content")
-
-# Overwrite the original file with the encrypted content
-echo "$encryptedContent" > "$filePath"
-````
-
-3. Open your terraform `main.tf` file
-4. The file should have the following code:
-````
-resource "null_resource" "encrypt_tfstate" {
-  triggers = {
-    timestamp = timestamp()
-  }
-
-  provisioner "local-exec" {
-    command = "path/to/your/script.sh"
-  }
-}
-
-terraform {
-  backend "s3" {
-    bucket = "your-s3-bucket"
-    key    = "terraform.tfstate"
-    encrypt = true
-  }
-}
+# Overwrite the original file with the decrypted content
+[System.IO.File]::WriteAllBytes('C:\Users\user\test.txt', $decryptedBytes)
 ````
