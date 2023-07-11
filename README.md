@@ -88,7 +88,7 @@ $base64Content = [System.Convert]::ToBase64String($fileContent)
 $encryptedContent = vault write -field=ciphertext transit/encrypt/my-key plaintext=$base64Content
 
 # Overwrite the original file with the encrypted content
-$encryptedContent > $C:\Users\user\test.txt
+$encryptedContent > 'C:\Users\user\test.txt'
 ````
 
 #### Automate encryption with Transit Secrets Engine
