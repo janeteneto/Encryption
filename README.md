@@ -79,13 +79,16 @@ vault write -f transit/keys/my-key
 
 ````
 # Read the contents of the file into a byte array
-$fileContent = [System.IO.File]::ReadAllBytes('C:\Users\user\terraform\terraform.tfstate')
+$fileContent = [System.IO.File]::ReadAllBytes('C:\Users\user\test.txt')
 
 # Convert the byte array content to a Base64-encoded string
 $base64Content = [System.Convert]::ToBase64String($fileContent)
 
 # Encrypt the Base64-encoded content using the Transit Secrets Engine in Vault
 $encryptedContent = vault write -field=ciphertext transit/encrypt/my-key plaintext=$base64Content
+
+# Overwrite the original file with the encrypted content
+$encryptedContent > $C:\Users\user\test.txt
 ````
 
 #### Automate encryption with Transit Secrets Engine
