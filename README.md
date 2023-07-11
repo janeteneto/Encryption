@@ -64,14 +64,14 @@ export VAULT_ADDR="http://127.0.0.1:8200"
 
 - The vault is ready to be used!
 
-#### Enable Transit Secrets Engine and encrypt the `terraform.tfstate` file
+#### Enable Transit Secrets Engine and encrypt a file
 
 1. On the same PowerShell terminal, run the command
 ````
 vault secrets enable transit
 ````
 
-6. Create an encryption key ring named `test` by executing the following command:
+6. Create an encryption key ring named `my-key` by executing the following command:
 ````
 vault write -f transit/keys/my-key
 ````
