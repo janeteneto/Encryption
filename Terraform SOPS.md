@@ -65,16 +65,17 @@ terraform {
 
 - Every time we run `terraform init`, Terraform will go to the backend and fetch the tfstate file from there, which is the encrypted file we uploaded to S3. In order to initialise based on the latest state file, we need to **delete the encrypted one on the s3 bucket after downloading it**. This way, Terraform will not use the file on the S3, and we can specify which state file we want to be used.
 
-3. Make sure to be in the correct directory on the terminal, then run the command:
+3. Run `terraform init` on your machine, if you haven't done so before
+
+4. Make sure to be in the correct directory on the terminal, then run the command:
 ````
 sops -d encrypted.tfstate > .terraform/terraform.tfstate
 ````
+- This will decrypt the encrypted state file and overwrite the fresh one that was created automatically in step 3
 
-4. Run `terraform init` on your machine, if you haven't done so before
-
-5. Step 4 created a brand new tfstate file, but we want to apply the previous one that has been decrypted. To do that, we need this command:
+5. Run the command, just like normal:
 ````
-terraform apply -state=decrypted.tfstate && ./script.sh
+terraform apply && ./script.sh
 ````
 
-- This way, Terraform will use the content in the decrypted state file.
+- This way, Terraform will use the content in the latest decrypted state file.
