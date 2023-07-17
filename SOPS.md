@@ -58,3 +58,10 @@ terraform {
 - The file is encrypted and uploaded to S3!
 
 ## Decrypt and re-initialise Terraform
+
+1. Download the file from the S3 bucket
+2. Make sure to be in the correct directory on the terminal, then run the command:
+````
+sops -d encrypted.tfstate > .terraform/terraform.tfstate
+````
+- This will overwrite or
