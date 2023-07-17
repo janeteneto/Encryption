@@ -34,7 +34,7 @@ aws s3 cp encrypted.tfstate s3://janetetest/terraform.tfstate
 - The first command uses our KMS key to encrypt the file
 - The second command copies the encrypted file's content into the terraform.tfstate, located in our S3 bucket. **This way, whenever we run this script, the original content of the tfstate will be encrypted and be placed in a file called `encrypted.tfstate`, then with the copy command, it uploads the encrypted content and replaces the original tfstate file's content in the S3 bucket**
 
-## Setting and initialise Terraform backend
+## Setting and initialising Terraform backend
 
 1. On the same directory, create a file named `main.tf`. We will create this file to configure our infrastructure and enable us to use the s3 bucket as a backend. The file should look like this:
 ````
