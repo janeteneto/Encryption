@@ -64,4 +64,3 @@ terraform {
 ````
 sops -d encrypted.tfstate > .terraform/terraform.tfstate
 ````
-- This will overwrite or
