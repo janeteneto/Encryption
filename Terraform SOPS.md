@@ -67,7 +67,7 @@ terraform {
 
 3. Make sure to be in the correct directory on the terminal, then run the command:
 ````
-sops -d encrypted.tfstate > decrypted.tfstate
+sops -d encrypted.tfstate > .terraform/terraform.tfstate
 ````
 
 4. Run `terraform init` on your machine, if you haven't done so before
