@@ -51,4 +51,10 @@ terraform {
 }
 ````
 
-2. 
+2. On the terminal, run `chmod +x script.sh` to make the file executable
+3. Then `terraform init`
+4. Then `terraform apply && ./script.sh`
+
+- The file is encrypted and uploaded to S3!
+
+## Decrypt and re-initialise Terraform
