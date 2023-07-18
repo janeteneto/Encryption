@@ -28,8 +28,8 @@ creation_rules:
 3. For the encryption of the file, I will create a script that will allow faster encryption and upload of the file to the bucket. The script file is called `script.sh` and looks like this:
 ````
 #!/bin/bash
-sops --encrypt --kms arn:aws:kms:us-east-1:358271186147:key/0f7045e8-719b-4aa7-a4e4-fdee49e21321 .terraform/terraform.tfstate > encrypted.tfstate
-aws s3 cp encrypted.tfstate s3://janetetest/terraform.tfstate
+sops --encrypt --kms arn:aws:kms:us-east-1:358271186147:key/0f7045e8-719b-4aa7-a4e4-fdee49e21321 -i .terraform/terraform.tfstate
+aws s3 cp .terraform/terraform.tfstate s3://janetetest/terraform.tfstate
 ````
 - The first command uses our KMS key to encrypt the file
 - The second command copies the encrypted file's content into the terraform.tfstate, located in our S3 bucket. **This way, whenever we run this script, the original content of the tfstate will be encrypted and be placed in a file called `encrypted.tfstate`, then with the copy command, it uploads the encrypted content and replaces the original tfstate file's content in the S3 bucket**
