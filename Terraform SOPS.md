@@ -61,6 +61,7 @@ terraform {
 
 1. Create a new file named `download.sh`, with the following commands:
 ````
+#!/bin/bash
 aws s3 cp s3://janetetest/terraform.tfstate ./
 aws s3 rm s3://janetetest/terraform.tfstate
 ````
