@@ -59,17 +59,21 @@ terraform {
 
 ## Decrypt tfstate and re-initialise Terraform
 
-1. Download the file from the S3 bucket
+1. Create a new file named `download.sh`, with the following commands:
+````
+aws s3 cp s3://janetetest/terraform.tfstate ./
+aws s3 rm s3://janetetest/terraform.tfstate
+````
 
-2. Delete the state file on the S3 bucket
-
+- The first command downloads the state file from the S3 bucket
+- The second command deletes the state file on the S3 bucket
 - Every time we run `terraform init`, Terraform will go to the backend and fetch the tfstate file from there, which is the encrypted file we uploaded to S3. In order to initialise based on the latest state file, we need to **delete the encrypted one on the s3 bucket after downloading it**. This way, Terraform will not use the file on the S3, and we can specify which state file we want to be used.
 
 3. Run `terraform init` on your machine, if you haven't done so before
 
 4. Make sure to be in the correct directory on the terminal, then run the command:
 ````
-sops -d encrypted.tfstate > .terraform/terraform.tfstate
+sops -d terraform.tfstate > .terraform/terraform.tfstate
 ````
 - This will decrypt the encrypted state file and overwrite the fresh one that was created automatically in step 3
 
